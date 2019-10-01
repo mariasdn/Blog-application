@@ -40,6 +40,7 @@ def register():
                 (username, generate_password_hash(password))
             )
             db.commit()
+            print("User: {} has been registered".format(username))
             return redirect(url_for('auth.login'))
 
         flash(error)
@@ -65,6 +66,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
+            print("User: {} has logged in".format(username))
             return redirect(url_for('index'))
 
         flash(error)
@@ -74,12 +76,12 @@ def login():
 @bp.before_app_first_request
 def load_logged_in_user():
     user_id = session.get('user_id')
-
+    print("User id: {}".format(user_id))
     if user_id is None:
         g.user = None
     else:
         g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
+            'SELECT username FROM user WHERE id = ?', (user_id,)
         ).fetchone()
 
 @bp.route('/logout')
